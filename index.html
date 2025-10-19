@@ -580,17 +580,23 @@
 
                 console.log('Sending request to ModelsLab...');
                 // Send a POST request to ModelsLab's API
-                const response = await fetch('/api/generate', {
+                const response = await fetch('https://api.modelslab.com/api/v6/images/img2img', {
                     method: 'POST', // HTTP POST method
                     headers: {
                         'Content-Type': 'application/json', // Tell server we're sending JSON
                     },
                     // The body contains all the parameters for the API
                     body: JSON.stringify({
-                    apiKey: apiKey,
-                    initImage: imageData,
-                    prompt: prompt,
-}),
+                        key: apiKey, // Your API key
+                        init_image: imageData, // Your drawing
+                        prompt: prompt, // What to generate
+                        negative_prompt: '', // Things to avoid (empty)
+                        strength: 0.5, // How much the original image influences the result (0-1)
+                        guidance_scale: 7.5, // How closely to follow the prompt (higher = stricter)
+                        seed: Math.floor(Math.random() * 1000000), // Random seed for variety
+                        samples: 1, // How many images to generate
+                        steps: 30, // How many processing steps (higher = better quality but slower)
+                        safety_checker: true, // Enable safety filtering
                     }),
                 });
 
