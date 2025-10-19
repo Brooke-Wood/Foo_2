@@ -580,7 +580,7 @@
 
                 console.log('Sending request to ModelsLab...');
                 // Send a POST request to ModelsLab's API
-                const response = await fetch('https://api.modelslab.com/api/v6/images/img2img', {
+                response = await fetch('/api/generate', {
                     method: 'POST', // HTTP POST method
                     headers: {
                         'Content-Type': 'application/json', // Tell server we're sending JSON
