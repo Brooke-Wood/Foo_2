@@ -1,41 +1,632 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw & Generate</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <head> 
-  
-    <title> Website Title </title>
-    
-    <style> 
-      img {
-        width: 500px; 
-        border.radius: 100px;
-      }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(to bottom right, #0f172a, #1e293b);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .api-key-input {
+            background-color: #475569;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #334155;
+        }
+
+        .api-key-input p {
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .api-key-input small {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        .api-key-input a {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="password"],
+        input[type="text"],
+        textarea,
+        input[type="color"],
+        input[type="range"] {
+            padding: 0.5rem 0.75rem;
+            background-color: #475569;
+            color: white;
+            border: 1px solid #334155;
+            border-radius: 0.375rem;
+            font-family: inherit;
+        }
+
+        input[type="password"]::placeholder,
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: #475569;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #334155;
+        }
+
+        canvas {
+            border: 2px solid #334155;
+            border-radius: 0.375rem;
+            background-color: white;
+            cursor: crosshair;
+            width: 100%;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #2563eb;
+        }
+
+        .btn-secondary {
+            background-color: #475569;
+            color: #e2e8f0;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #334155;
+        }
+
+        .btn-success {
+            background-color: #16a34a;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background-color: #15803d;
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background-color: #b91c1c;
+        }
+
+        .btn-generate {
+            background-color: #a855f7;
+            color: white;
+            width: 100%;
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-generate:hover:not(:disabled) {
+            background-color: #9333ea;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            color: #cbd5e1;
+            font-size: 0.875rem;
+        }
+
+        input[type="color"] {
+            width: 2.5rem;
+            height: 2.5rem;
+            cursor: pointer;
+        }
+
+        input[type="range"] {
+            width: 6rem;
+        }
+
+        .color-value {
+            color: #cbd5e1;
+            font-size: 0.875rem;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #cbd5e1;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            height: 6rem;
+        }
+
+        .generated-image-container {
+            margin-top: 1rem;
+        }
+
+        .generated-image-container p {
+            color: #cbd5e1;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .generated-image-container img {
+            width: 100%;
+            border-radius: 0.375rem;
+            border: 1px solid #334155;
+            margin-bottom: 0.5rem;
+        }
+
+        .generated-image-container a {
+            display: block;
+            text-align: center;
+            padding: 0.5rem 1rem;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .generated-image-container a:hover {
+            background-color: #2563eb;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 1023px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
-  
-  </head>
+</head>
+<body>
+    <div class="container">
+        <h1>Draw & Generate</h1>
 
+        <!-- API Key Input Section -->
+        <div class="api-key-input" id="apiKeySection">
+            <p>Enter your ModelsLab API key to enable image generation:</p>
+            <div class="input-group">
+                <input type="password" id="apiKeyInput" placeholder="Your ModelsLab API key">
+                <button class="btn-primary" onclick="hideApiKeyInput()">Done</button>
+            </div>
+            <small>Get a free API key at <a href="https://modelslab.com" target="_blank">modelslab.com</a></small>
+        </div>
 
+        <!-- Main Grid -->
+        <div class="grid">
+            <!-- Canvas Section -->
+            <div class="card">
+                <!-- Canvas for drawing -->
+                <canvas id="canvas" width="600" height="500"></canvas>
 
-  <body>
+                <!-- Drawing Toolbar -->
+                <div class="toolbar">
+                    <button class="btn-primary" onclick="setTool('brush')">Brush</button>
+                    <button class="btn-secondary" onclick="setTool('eraser')">Eraser</button>
+                    <button class="btn-secondary" onclick="undo()">Undo</button>
+                    <button class="btn-secondary" onclick="redo()">Redo</button>
+                </div>
 
+                <!-- Color and Size Controls -->
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Color:</label>
+                        <input type="color" id="colorPicker" value="#000000" onchange="setBrushColor(this.value)">
+                    </div>
+                    <div class="control-group">
+                        <label>Size:</label>
+                        <input type="range" id="brushSizeSlider" min="1" max="50" value="5" onchange="setBrushSize(this.value)">
+                        <span class="color-value" id="brushSizeDisplay">5px</span>
+                    </div>
+                </div>
 
-    <h1>the website </h1>
-    
-    <p>panko <a href="https://www.paranatural.net/"> pant </a></p>
-    
-    <img src= "/beeBoat.png" alt= "Bee and Wesley">
-    
-    <h2> what </h2>
-    <ul>
-      <li>hey </li>
-      <li>there </li>
-      <li><strong>delilah </strong> </li>
-      <li>  
-        <a href = "https://en.wikipedia.org/wiki/Chicago">New York City</a>
-      </li>
-    </ul>
-    
-    <a href="secondpage.html"> test link </a>
+                <!-- Download and Clear Buttons -->
+                <div class="toolbar">
+                    <button class="btn-success" onclick="downloadDrawing()">📥 Download</button>
+                    <button class="btn-danger" onclick="clearCanvas()">🗑️ Clear</button>
+                </div>
+            </div>
 
-  </body>
+            <!-- Generation Section -->
+            <div class="card">
+                <h2>✨ Generate</h2>
+
+                <div class="form-group">
+                    <label>Prompt:</label>
+                    <textarea id="promptInput" placeholder="Describe what you want to generate..."></textarea>
+                </div>
+
+                <button class="btn-generate" id="generateBtn" onclick="generateImage()">
+                    ✨ Generate Image
+                </button>
+
+                <!-- Generated Image Display -->
+                <div class="generated-image-container" id="generatedContainer" style="display: none;">
+                    <p>Generated Result:</p>
+                    <img id="generatedImage" alt="Generated">
+                    <a id="downloadGenerated" href="#" download="generated.png">Download</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== STATE VARIABLES =====
+        // These store the current state of our application
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let isDrawing = false; // Are we currently drawing?
+        let brushSize = 5; // Size of the brush in pixels
+        let brushColor = '#000000'; // Color of the brush
+        let tool = 'brush'; // Current tool: 'brush' or 'eraser'
+        let history = []; // Array of previous canvas states for undo/redo
+        let historyStep = -1; // Current position in history array
+        let apiKey = ''; // ModelsLab API key
+
+        // ===== INITIALIZATION =====
+        // Set up the canvas when the page loads
+        window.addEventListener('load', () => {
+            // Fill canvas with white background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Save the initial blank state
+            saveHistory();
+
+            // Set up mouse event listeners on the canvas
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+        });
+
+        // ===== DRAWING FUNCTIONS =====
+        // startDrawing is called when the user presses the mouse button down
+        function startDrawing(e) {
+            isDrawing = true;
+            // Get the canvas position on the screen
+            const rect = canvas.getBoundingClientRect();
+            // Calculate where the user clicked relative to the canvas
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (tool === 'brush') {
+                ctx.beginPath(); // Start a new drawing path
+                ctx.moveTo(x, y); // Move to where the user clicked
+            } else if (tool === 'eraser') {
+                // For eraser, clear a rectangular area around the click
+                ctx.clearRect(x - brushSize / 2, y - brushSize / 2, brushSize, brushSize);
+            }
+        }
+
+        // draw is called as the user moves the mouse while drawing
+        function draw(e) {
+            if (!isDrawing) return; // Only draw if the mouse button is held down
+
+            // Get the canvas position on the screen
+            const rect = canvas.getBoundingClientRect();
+            // Calculate where the mouse is relative to the canvas
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (tool === 'brush') {
+                // Set drawing properties
+                ctx.lineWidth = brushSize; // Thickness of the line
+                ctx.lineCap = 'round'; // Round ends on the line
+                ctx.lineJoin = 'round'; // Round corners where lines meet
+                ctx.strokeStyle = brushColor; // Color of the line
+                ctx.lineTo(x, y); // Draw a line to the current mouse position
+                ctx.stroke(); // Actually render the line
+            } else if (tool === 'eraser') {
+                // For eraser, clear a rectangular area
+                ctx.clearRect(x - brushSize / 2, y - brushSize / 2, brushSize, brushSize);
+            }
+        }
+
+        // stopDrawing is called when the user releases the mouse button
+        function stopDrawing() {
+            if (isDrawing) {
+                ctx.closePath(); // End the current drawing path
+                isDrawing = false; // Mark that we're no longer drawing
+                saveHistory(); // Save this stroke to history so it can be undone
+            }
+        }
+
+        // ===== TOOL FUNCTIONS =====
+        // setTool changes between 'brush' and 'eraser'
+        function setTool(newTool) {
+            tool = newTool;
+        }
+
+        // setBrushSize updates the brush/eraser size
+        function setBrushSize(size) {
+            brushSize = parseInt(size);
+            document.getElementById('brushSizeDisplay').textContent = brushSize + 'px';
+        }
+
+        // setBrushColor updates the brush color
+        function setBrushColor(color) {
+            brushColor = color;
+        }
+
+        // ===== HISTORY FUNCTIONS (UNDO/REDO) =====
+        // saveHistory takes a snapshot of the current canvas and stores it for undo/redo
+        function saveHistory() {
+            // Remove any "future" states if user undid something then drew again
+            const newHistory = history.slice(0, historyStep + 1);
+            // Convert the canvas to a data URL (image string) and add it to history
+            newHistory.push(canvas.toDataURL());
+            // Update history and move the pointer to the newest state
+            history = newHistory;
+            historyStep = newHistory.length - 1;
+        }
+
+        // undo moves back one step in the history
+        function undo() {
+            if (historyStep > 0) {
+                // Move back one step
+                historyStep--;
+                // Load the previous state from history
+                const img = new Image();
+                img.src = history[historyStep];
+                // Once the image loads, redraw it on the canvas
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+                    ctx.drawImage(img, 0, 0); // Draw the previous state
+                };
+            }
+        }
+
+        // redo moves forward one step in the history (opposite of undo)
+        function redo() {
+            if (historyStep < history.length - 1) {
+                // Move forward one step
+                historyStep++;
+                // Load the next state from history
+                const img = new Image();
+                img.src = history[historyStep];
+                // Once the image loads, redraw it on the canvas
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                };
+            }
+        }
+
+        // ===== CANVAS MANAGEMENT =====
+        // clearCanvas fills the canvas with white and saves to history
+        function clearCanvas() {
+            ctx.fillStyle = 'white'; // Set color to white
+            ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill entire canvas
+            saveHistory(); // Save this state so it can be undone
+            document.getElementById('generatedContainer').style.display = 'none'; // Hide generated image
+        }
+
+        // downloadDrawing saves the canvas as a PNG file to the user's computer
+        function downloadDrawing() {
+            const link = document.createElement('a'); // Create a hidden link element
+            link.href = canvas.toDataURL(); // Set link to point to the canvas image
+            link.download = 'drawing.png'; // Set the filename
+            link.click(); // Trigger the download
+        }
+
+        // ===== API KEY MANAGEMENT =====
+        // hideApiKeyInput hides the API key input form
+        function hideApiKeyInput() {
+            const keyInput = document.getElementById('apiKeyInput').value;
+            if (keyInput.trim()) {
+                apiKey = keyInput;
+                document.getElementById('apiKeySection').style.display = 'none';
+            } else {
+                alert('Please enter an API key');
+            }
+        }
+
+        // ===== IMAGE GENERATION =====
+        // generateImage sends the canvas drawing to ModelsLab's API for image generation
+        async function generateImage() {
+            // Check that we have an API key
+            if (!apiKey) {
+                alert('Please enter your ModelsLab API key');
+                return;
+            }
+
+            // Get the prompt from the textarea
+            const prompt = document.getElementById('promptInput').value;
+            // Check that we have a prompt
+            if (!prompt.trim()) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            // Update button to show loading state
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<div class="spinner"></div> Generating...';
+
+            try {
+                // Convert the canvas drawing to a base64-encoded image string
+                const imageData = canvas.toDataURL('image/png');
+
+                console.log('Sending request to ModelsLab...');
+                // Send a POST request to ModelsLab's API
+                const response = await fetch('https://api.modelslab.com/api/v6/images/img2img', {
+                    method: 'POST', // HTTP POST method
+                    headers: {
+                        'Content-Type': 'application/json', // Tell server we're sending JSON
+                    },
+                    // The body contains all the parameters for the API
+                    body: JSON.stringify({
+                        key: apiKey, // Your API key
+                        init_image: imageData, // Your drawing
+                        prompt: prompt, // What to generate
+                        negative_prompt: '', // Things to avoid (empty)
+                        strength: 0.5, // How much the original image influences the result (0-1)
+                        guidance_scale: 7.5, // How closely to follow the prompt (higher = stricter)
+                        seed: Math.floor(Math.random() * 1000000), // Random seed for variety
+                        samples: 1, // How many images to generate
+                        steps: 30, // How many processing steps (higher = better quality but slower)
+                        safety_checker: true, // Enable safety filtering
+                    }),
+                });
+
+                console.log('Response status:', response.status);
+                // Parse the response as JSON
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                // Check if the generation was successful
+                if (data.status === 'success' && data.output && data.output.length > 0) {
+                    // Display the first generated image
+                    const generatedContainer = document.getElementById('generatedContainer');
+                    document.getElementById('generatedImage').src = data.output[0];
+                    document.getElementById('downloadGenerated').href = data.output[0];
+                    generatedContainer.style.display = 'block';
+                } else if (data.message) {
+                    alert('Error: ' + data.message); // Show error message from API
+                } else {
+                    alert('Generation failed. Response: ' + JSON.stringify(data));
+                }
+            } catch (error) {
+                // Catch any network or other errors
+                console.error('Fetch error:', error);
+                alert('Error: ' + error.message);
+            } finally {
+                // Restore button to normal state
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '✨ Generate Image';
+            }
+        }
+    </script>
+</body>
 </html>
